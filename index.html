@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blackjack Pro Trainer</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* Seus estilos CSS aqui */
+    :root {
+      --primary-gradient: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+      --danger-gradient: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
+      --success-gradient: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+      --warning-gradient: linear-gradient(135deg, #f7971e 0%, #ffd200 100%);
+      --dark-bg: #0f172a;
+      --darker-bg: #0a0e17;
+      --card-bg: rgba(30, 41, 59, 0.8);
+      --text-light: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-radius: 12px;
+      --box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--dark-bg);
+      color: var(--text-light);
+      min-height: 100vh;
+      line-height: 1.6;
+      padding: 2rem;
+      background-image: 
+        radial-gradient(at 80% 0%, rgba(39, 51, 89, 0.5) 0px, transparent 50%),
+        radial-gradient(at 0% 50%, rgba(106, 17, 203, 0.3) 0px, transparent 50%);
+    }
+
+    .app-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.8rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(90deg, #ff8a00, #e52e71, #6a11cb);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      position: relative;
+      padding-bottom: 1rem;
+    }
+
+    h1::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 200px;
+      height: 4px;
+      background: linear-gradient(90deg, transparent, #ff8a00, #e52e71, transparent);
+      border-radius: 2px;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+    }
+
+    .container {
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      border-radius: var(--border-radius);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: var(--box-shadow);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      transition: var(--transition);
+    }
+
+    .container:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+    }
+
+    .button-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin: 1.5rem 0;
+    }
+
+    .btn {
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      border: none;
+      border-radius: var(--border-radius);
+      color: white;
+      cursor: pointer;
+      transition: var(--transition);
+      box-shadow: var(--box-shadow);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .btn i {
+      font-size: 1.2rem;
+    }
+
+    .btn-primary {
+      background: var(--primary-gradient);
+    }
+
+    .btn-danger {
+      background: var(--danger-gradient);
+    }
+
+    .btn-success {
+      background: var(--success-gradient);
+    }
+
+    .btn-warning {
+      background: var(--warning-gradient);
+      color: #333;
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      color: var(--text-light);
+    }
+
+    .btn-outline:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+      gap: 0.75rem;
+      margin: 1rem 0;
+    }
+
+    .carta-btn {
+      width: 100%;
+      height: 95px;
+      font-size: 1.2rem;
+      font-weight: 700;
+      border: none;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text-light);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .carta-btn.vermelho {
+      color: #ff6b6b;
+    }
+
+    .carta-btn.selected {
+      background: var(--primary-gradient);
+      color: white;
+      transform: scale(1.05);
+      box-shadow: 0 0 25px rgba(106, 17, 203, 0.6);
+    }
+
+    .carta-valor {
+      font-size: 1.5rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .carta-naipe {
+      font-size: 0.9rem;
+      opacity: 0.8;
+    }
+
+    .carta-contador {
+      position: absolute;
+      bottom: 5px;
+      right: 5px;
+      background: rgba(0, 0, 0, 0.7);
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      font-size: 0.7rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .results-box {
+      background: rgba(15, 23, 42, 0.7);
+      padding: 1.5rem;
+      border-radius: var(--border-radius);
+      font-size: 1rem;
+      line-height: 1.7;
+      color: var(--text-light);
+      border-left: 4px solid #6a11cb;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .stat-box {
+      background: rgba(30, 41, 59, 0.5);
+      padding: 0.75rem;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .stat-box.highlight {
+      background: rgba(106, 17, 203, 0.2);
+      border: 1px solid rgba(106, 17, 203, 0.3);
+    }
+
+    .stat-label {
+      display: block;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 0.25rem;
+    }
+
+    .stat-value {
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+
+    .stat-value.positive {
+      color: #38ef7d;
+    }
+
+    .stat-value.negative {
+      color: #ff4b2b;
+    }
+
+    .alert {
+      padding: 1rem;
+      border-radius: var(--border-radius);
+      margin: 1rem 0;
+      font-weight: 600;
+    }
+
+    .alert-success {
+      background: rgba(56, 239, 125, 0.1);
+      border: 1px solid rgba(56, 239, 125, 0.3);
+      color: #38ef7d;
+    }
+
+    .alert-waiting {
+      background: rgba(247, 151, 30, 0.1);
+      border: 1px solid rgba(247, 151, 30, 0.3);
+      color: #f7971e;
+    }
+
+    .recommendation-box {
+      margin: 1.5rem 0;
+    }
+
+    .recommendation {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .rec-label {
+      font-weight: 600;
+    }
+
+    .rec-value {
+      font-weight: 700;
+    }
+
+    .rec-value.split {
+      color: #ffd200;
+    }
+
+    .rec-value.double {
+      color: #ff8a00;
+    }
+
+    .game-info {
+      margin: 1rem 0;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .current-hand {
+      margin-top: 1.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 1rem 1.5rem;
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      z-index: 1000;
+      opacity: 0;
+      transition: all 0.3s ease;
+    }
+
+    .toast.show {
+      bottom: 30px;
+      opacity: 1;
+    }
+
+    .toast-success {
+      background: rgba(56, 239, 125, 0.9);
+    }
+
+    .toast-error {
+      background: rgba(255, 75, 43, 0.9);
+    }
+
+    .select-custom {
+      padding: 0.75rem 1rem;
+      font-size: 1rem;
+      border-radius: var(--border-radius);
+      border: none;
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text-light);
+      cursor: pointer;
+      margin-left: 1rem;
+      transition: var(--transition);
+      box-shadow: var(--box-shadow);
+      appearance: none;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 0.75rem center;
+      background-size: 1rem;
+    }
+
+    .select-custom:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(106, 17, 203, 0.3);
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 1rem;
+      }
+
+      h1 {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+      }
+
+      .container {
+        padding: 1rem;
+      }
+
+      .button-group {
+        flex-direction: column;
+      }
+
+      .btn {
+        width: 100%;
+      }
+
+      .card-grid {
+        grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+      }
+
+      .carta-btn {
+        height: 85px;
+        font-size: 1rem;
+      }
+
+      .carta-valor {
+        font-size: 1.3rem;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    .container {
+      animation: fadeIn 0.6s ease-out forwards;
+    }
+
+    .btn-pulse {
+      animation: pulse 2s infinite;
+    }
+
+    /* Estilos para o bankroll */
+    .bankroll-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      align-items: center;
+    }
+
+    .bankroll-input {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .bankroll-input label {
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .input-custom {
+      padding: 0.75rem;
+      font-size: 1rem;
+      border-radius: var(--border-radius);
+      border: none;
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text-light);
+      width: 80px;
+      text-align: center;
+      transition: var(--transition);
+    }
+
+    .input-custom:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(106, 17, 203, 0.3);
+    }
+
+    .bankroll-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+  <header>
+    <h1><i class="fas fa-cards"></i> Blackjack Pro Trainer</h1>
+    <p class="subtitle">Treinador profissional para contagem de cartas Hi-Lo</p>
+  </header>
+
+  <main>
+    <!-- Configuração do jogo -->
+    <section class="game-config">
+      <div class="container">
+        <label for="baralhos"><i class="fas fa-layer-group"></i> Número de baralhos:</label>
+        <select id="baralhos" class="select-custom">
+          <option value="1">1 Baralho</option>
+          <option value="2">2 Baralhos</option>
+          <option value="4">4 Baralhos</option>
+          <option value="6" selected>6 Baralhos</option>
+          <option value="8">8 Baralhos</option>
+        </select>
+      </div>
+    </section>
+
+    <!-- Controle de ganhos/perdas -->
+    <section class="bankroll-tracker">
+      <div class="container">
+        <h2><i class="fas fa-coins"></i> Controle de Bankroll</h2>
+        <div class="bankroll-controls">
+          <div class="bankroll-input">
+            <label for="aposta-valor">Valor da Aposta:</label>
+            <input type="number" id="aposta-valor" min="1" value="10" class="input-custom">
+          </div>
+          <div class="button-group">
+            <button id="ganhar-btn" class="btn btn-success">
+              <i class="fas fa-plus-circle"></i> Ganhou
+            </button>
+            <button id="perder-btn" class="btn btn-danger">
+              <i class="fas fa-minus-circle"></i> Perdeu
+            </button>
+            <button id="reset-bankroll-btn" class="btn btn-outline">
+              <i class="fas fa-sync-alt"></i> Resetar
+            </button>
+          </div>
+        </div>
+        <div class="bankroll-stats">
+          <div class="stat-box">
+            <span class="stat-label"><i class="fas fa-wallet"></i> Saldo:</span>
+            <span class="stat-value" id="saldo-display">0</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label"><i class="fas fa-trophy"></i> Vitórias:</span>
+            <span class="stat-value" id="vitorias-display">0</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label"><i class="fas fa-times-circle"></i> Derrotas:</span>
+            <span class="stat-value" id="derrotas-display">0</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label"><i class="fas fa-percentage"></i> Taxa Vitórias:</span>
+            <span class="stat-value" id="taxa-vitorias-display">0%</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Cartas vistas -->
+    <section class="cards-section">
+      <div class="container">
+        <h2><i class="fas fa-eye"></i> Cartas já vistas</h2>
+        <p class="section-description">Clique nas cartas abaixo para adicionar ao histórico</p>
+        <div id="cartas-vistas" class="card-grid"></div>
+        <div class="button-group">
+          <button id="desfazer-carta" class="btn btn-warning">
+            <i class="fas fa-undo"></i> Desfazer última carta
+          </button>
+          <button id="limpar-cartas" class="btn btn-danger">
+            <i class="fas fa-trash"></i> Limpar histórico
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Mão do jogador -->
+    <section class="player-hand">
+      <div class="container">
+        <h2><i class="fas fa-user"></i> Sua mão</h2>
+        <p class="section-description">Selecione até 3 cartas para simular sua mão</p>
+        <div id="mao" class="card-grid"></div>
+        <div class="button-group">
+          <button id="limpar-mao" class="btn btn-outline">
+            <i class="fas fa-times"></i> Limpar mão
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Carta do dealer -->
+    <section class="dealer-card">
+      <div class="container">
+        <h2><i class="fas fa-robot"></i> Carta do dealer</h2>
+        <p class="section-description">Selecione a carta visível do dealer</p>
+        <div id="dealer" class="card-grid"></div>
+      </div>
+    </section>
+
+    <!-- Resultados -->
+    <section class="results">
+      <div class="container">
+        <h2><i class="fas fa-chart-line"></i> Análise do Jogo</h2>
+        <div id="resultado" class="results-box"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Blackjack Pro Trainer &copy; 2023 - Sistema Hi-Lo para contagem de cartas</p>
+  </footer>
+</div>
+
+<script>
+// Constantes do jogo
+const VALORES_HILO = {
+  '2': 1, '3': 1, '4': 1, '5': 1, '6': 1,
+  '7': 0, '8': 0, '9': 0,
+  '10': -1, 'J': -1, 'Q': -1, 'K': -1, 'A': -1
+};
+
+const TODAS_CARTAS = ['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
+const NAIPES = {
+  '2': '♦', '3': '♥', '4': '♠', '5': '♣', '6': '♦',
+  '7': '♥', '8': '♠', '9': '♣', '10': '♦',
+  'J': '♥', 'Q': '♠', 'K': '♣', 'A': '♦'
+};
+
+// Variáveis de estado do jogo
+let baralhos = 6;
+let historico = {}; 
+let cartasHistorico = []; 
+let mao = []; 
+let dealer = null;
+const trueCountMinimoParaEntrar = 1;
+const cartasPorRodadaMedia = 10;
+let rodadasObservadas = 0;
+
+// Variáveis de bankroll
+let saldo = 0;
+let vitorias = 0;
+let derrotas = 0;
+let valorAposta = 10;
+
+// Elementos DOM
+const cartasVistasDiv = document.getElementById('cartas-vistas');
+const maoDiv = document.getElementById('mao');
+const dealerDiv = document.getElementById('dealer');
+const resultadoDiv = document.getElementById('resultado');
+const baralhosSelect = document.getElementById('baralhos');
+const limparCartasBtn = document.getElementById('limpar-cartas');
+const desfazerCartaBtn = document.getElementById('desfazer-carta');
+const limparMaoBtn = document.getElementById('limpar-mao');
+const ganharBtn = document.getElementById('ganhar-btn');
+const perderBtn = document.getElementById('perder-btn');
+const resetBankrollBtn = document.getElementById('reset-bankroll-btn');
+const apostaValorInput = document.getElementById('aposta-valor');
+const saldoDisplay = document.getElementById('saldo-display');
+const vitoriasDisplay = document.getElementById('vitorias-display');
+const derrotasDisplay = document.getElementById('derrotas-display');
+const taxaVitoriasDisplay = document.getElementById('taxa-vitorias-display');
+
+// Funções de bankroll
+function atualizarBankroll() {
+  saldoDisplay.textContent = saldo;
+  vitoriasDisplay.textContent = vitorias;
+  derrotasDisplay.textContent = derrotas;
+  
+  const totalJogos = vitorias + derrotas;
+  const taxaVitorias = totalJogos > 0 ? Math.round((vitorias / totalJogos) * 100) : 0;
+  taxaVitoriasDisplay.textContent = `${taxaVitorias}%`;
+  
+  // Salvar no localStorage
+  localStorage.setItem('blackjackBankroll', JSON.stringify({
+    saldo,
+    vitorias,
+    derrotas,
+    valorAposta
+  }));
+}
+
+function carregarBankroll() {
+  const saved = localStorage.getItem('blackjackBankroll');
+  if (saved) {
+    const data = JSON.parse(saved);
+    saldo = data.saldo || 0;
+    vitorias = data.vitorias || 0;
+    derrotas = data.derrotas || 0;
+    valorAposta = data.valorAposta || 10;
+    apostaValorInput.value = valorAposta;
+    atualizarBankroll();
+  }
+}
+
+function registrarVitoria() {
+  valorAposta = parseInt(apostaValorInput.value) || 10;
+  saldo += valorAposta;
+  vitorias++;
+  atualizarBankroll();
+  showToast(`Vitória registrada! +${valorAposta}`, 'success');
+}
+
+function registrarDerrota() {
+  valorAposta = parseInt(apostaValorInput.value) || 10;
+  saldo -= valorAposta;
+  derrotas++;
+  atualizarBankroll();
+  showToast(`Derrota registrada! -${valorAposta}`, 'error');
+}
+
+function resetarBankroll() {
+  if (confirm("Tem certeza que deseja resetar todo o histórico de ganhos/perdas?")) {
+    saldo = 0;
+    vitorias = 0;
+    derrotas = 0;
+    valorAposta = 10;
+    apostaValorInput.value = valorAposta;
+    atualizarBankroll();
+    showToast("Bankroll resetado com sucesso", 'success');
+  }
+}
+
+// Função para criar botões de carta
+function criarBotaoCarta(carta, handler, selected = false, isDealer = false) {
+  const btn = document.createElement('button');
+  btn.className = 'carta-btn';
+  if(selected) btn.classList.add('selected');
+  if(isDealer) btn.classList.add('dealer-card');
+  
+  // Determinar cor baseada no naipe
+  const naipe = NAIPES[carta];
+  const isRed = naipe === '♦' || naipe === '♥';
+  if(isRed) btn.classList.add('vermelho');
+  
+  btn.innerHTML = `
+    <span class="carta-valor">${carta}</span>
+    <span class="carta-naipe">${naipe}</span>
+  `;
+  
+  btn.onclick = () => handler(carta);
+  return btn;
+}
+
+// Atualiza a exibição das cartas vistas
+function atualizarHistorico() {
+  cartasVistasDiv.innerHTML = '';
+  TODAS_CARTAS.forEach(carta => {
+    const qtd = historico[carta] || 0;
+    const btn = criarBotaoCarta(carta, (c) => {
+      historico[c] = (historico[c] || 0) + 1;
+      cartasHistorico.push(c);
+      atualizarHistorico(); 
+      calcularEMostrar();
+    });
+    
+    if(qtd > 0) {
+      btn.innerHTML += `<span class="carta-contador">${qtd}</span>`;
+    }
+    cartasVistasDiv.appendChild(btn);
+  });
+}
+
+// Gerencia a seleção de cartas na mão do jogador
+function selecionarCartaMao(carta) {
+  if(mao.includes(carta)) {
+    // Remove se já estiver selecionada
+    mao = mao.filter(c => c !== carta);
+  } else if(mao.length < 3) {
+    mao.push(carta);
+  } else {
+    showToast('Você pode selecionar no máximo 3 cartas para sua mão');
+    return;
+  }
+  atualizarMao(); 
+  calcularEMostrar();
+}
+
+// Atualiza a exibição da mão do jogador
+function atualizarMao() {
+  maoDiv.innerHTML = '';
+  TODAS_CARTAS.forEach(carta => {
+    const selected = mao.includes(carta);
+    maoDiv.appendChild(criarBotaoCarta(carta, selecionarCartaMao, selected));
+  });
+}
+
+// Gerencia a seleção da carta do dealer
+function selecionarCartaDealer(carta) {
+  dealer = dealer === carta ? null : carta; 
+  atualizarDealer(); 
+  calcularEMostrar();
+}
+
+// Atualiza a exibição da carta do dealer
+function atualizarDealer() {
+  dealerDiv.innerHTML = '';
+  TODAS_CARTAS.forEach(carta => {
+    const selected = dealer === carta;
+    dealerDiv.appendChild(criarBotaoCarta(carta, selecionarCartaDealer, selected, true));
+  });
+}
+
+// Limpa todo o estado do jogo
+function limpar() {
+  historico = {}; 
+  cartasHistorico = []; 
+  mao = []; 
+  dealer = null; 
+  rodadasObservadas = 0;
+  atualizarHistorico(); 
+  atualizarMao(); 
+  atualizarDealer(); 
+  resultadoDiv.textContent = '';
+  showToast('Jogo reiniciado com sucesso', 'success');
+}
+
+// Remove a última carta adicionada ao histórico
+function desfazerUltimaCarta() {
+  if(cartasHistorico.length === 0) {
+    showToast("Nenhuma carta para desfazer!", 'error');
+    return;
+  }
+  
+  const ultima = cartasHistorico.pop();
+  if(historico[ultima]) {
+    historico[ultima]--;
+    if(historico[ultima] <= 0) delete historico[ultima];
+  }
+  atualizarHistorico(); 
+  calcularEMostrar();
+  showToast(`Carta ${ultima} removida do histórico`, 'success');
+}
+
+// Calcula o valor total da mão do jogador
+function calcularSoma(mao) {
+  let total = 0, ases = 0;
+  
+  for(const carta of mao) {
+    if(['J','Q','K'].includes(carta)) total += 10;
+    else if(carta === 'A') { ases++; total += 11; }
+    else total += parseInt(carta);
+  }
+  
+  // Ajuste para ases
+  while(total > 21 && ases > 0) { 
+    total -= 10; 
+    ases--; 
+  }
+  
+  return {
+    total, 
+    suave: (ases > 0 && total <= 21),
+    isBlackjack: (mao.length === 2 && total === 21)
+  };
+}
+
+// Calcula a contagem Hi-Lo baseada no histórico
+function calcularContagemHiLo() {
+  let contagem = 0;
+  for(const [carta, qtd] of Object.entries(historico)) {
+    contagem += (VALORES_HILO[carta] || 0) * qtd;
+  }
+  return contagem;
+}
+
+// Conta quantos ases ainda estão no baralho
+function contarAsesRestantes() {
+  const totalAses = baralhos * 4;
+  const vistos = historico['A'] || 0;
+  return totalAses - vistos;
+}
+
+// Estima quantos baralhos ainda não foram jogados
+function calcularBaralhosRestantes() {
+  const totalCartas = baralhos * 52;
+  let cartasVistas = Object.values(historico).reduce((a,b)=>a+b,0);
+  return Math.max(totalCartas - cartasVistas, 1) / 52;
+}
+
+// Gera recomendação de aposta baseada na contagem verdadeira
+function mostrarRecomendacaoAposta(tc) {
+  if(tc >= 3) return "🔥 Aposta MAXIMA (3+ unidades)";
+  if(tc >= 2) return "💰 Aposta alta (2 unidades)";
+  if(tc >= 1) return "👍 Aposta moderada (1-2 unidades)";
+  if(tc >= 0) return "😐 Aposta mínima (1 unidade)";
+  return "❌ Não apostar (contagem negativa)";
+}
+
+// Decide a melhor jogada baseada na estratégia básica e desvios
+function decidirJogadaAvancada(mao, dealer, trueCount) {
+  if(mao.length < 2 || !dealer) return "Selecione pelo menos 2 cartas e a carta do dealer";
+  
+  const {total, suave, isBlackjack} = calcularSoma(mao);
+  const d = dealer;
+  
+  // Blackjack automatico
+  if(isBlackjack) return "⭐ BLACKJACK! Pague 3:2";
+  
+  // Desvios avançados baseados na contagem verdadeira
+  if(total === 16 && d === '10' && trueCount >= 0) return "🔄 Parar (normalmente pedir, mas TC ≥ 0)";
+  if(total === 15 && d === '10' && trueCount >= 4) return "🔄 Parar (TC ≥ 4)";
+  if(suave && total === 18 && d === '2' && trueCount >= 1) return "🔄 Parar (A,7 vs 2, TC ≥ 1)";
+  if(total === 10 && d === '10' && trueCount >= 4) return "🔄 Dobrar (normalmente não, mas TC ≥ 4)";
+  if(total === 12 && ['2','3'].includes(d) && trueCount >= 3) return "🔄 Parar (normalmente pedir, mas TC ≥ 3)";
+  
+  // Pares
+  if(mao.length === 2 && mao[0] === mao[1]) {
+    const par = mao[0];
+    if(par === 'A' || par === '8') return "✂️ DIVIDIR";
+    if(par === '9' && ![7,10,'A'].includes(d)) return "✂️ DIVIDIR";
+    if(par === '7' && d <= 7) return "✂️ DIVIDIR";
+    if(par === '6' && d <= 6) return "✂️ DIVIDIR";
+    if(par === '4' && [5,6].includes(d)) return "✂️ DIVIDIR";
+    if(par === '2' || par === '3' || par === '7') {
+      if(d <= 7) return "✂️ DIVIDIR";
+    }
+  }
+  
+  // Mãos suaves (com Ás)
+  if(suave) {
+    if(total >= 19) return "🛑 PARAR";
+    if(total === 18) {
+      if(d >= 9) return "📢 PEDIR";
+      return "🛑 PARAR";
+    }
+    if([13,14,15,16,17].includes(total)) {
+      if(d >= 7) return "📢 PEDIR";
+      if(total === 17 && d === 'A') return "📢 PEDIR";
+      return "🛑 PARAR";
+    }
+  }
+  
+  // Mãos duras (sem Ás ou Ás contado como 1)
+  if(total >= 17) return "🛑 PARAR";
+  if(total >= 13 && ['2','3','4','5','6'].includes(d)) return "🛑 PARAR";
+  if(total === 12 && ['4','5','6'].includes(d)) return "🛑 PARAR";
+  if(total <= 11) {
+    if(mao.length === 2 && [9,10,11].includes(total) && !['A','10'].includes(d)) {
+      return "💰 DOBRAR";
+    }
+    return "📢 PEDIR";
+  }
+  
+  // Default
+  return "📢 PEDIR";
+}
+
+// Calcula e exibe todas as estatísticas e recomendações
+function calcularEMostrar() {
+  const contagem = calcularContagemHiLo();
+  const baralhosRest = calcularBaralhosRestantes();
+  const trueCount = parseFloat((contagem / baralhosRest).toFixed(2));
+  const asesRestantes = contarAsesRestantes();
+  const jogada = decidirJogadaAvancada(mao, dealer, trueCount);
+
+  const totalCartas = baralhos * 52;
+  const cartasVistas = Object.values(historico).reduce((a,b) => a+b, 0);
+  const estimativaRodadasRestantes = Math.floor((totalCartas - cartasVistas) / cartasPorRodadaMedia);
+
+  let alertaEntrada = '';
+  if (trueCount >= trueCountMinimoParaEntrar) {
+    alertaEntrada = `<div class="alert alert-success">
+      <i class="fas fa-bell"></i> <strong>ALERTA DE ENTRADA:</strong> True Count = ${trueCount} → <strong>HORA DE APOSTAR!</strong>
+    </div>`;
+    rodadasObservadas = 0;
+  } else {
+    alertaEntrada = `<div class="alert alert-waiting">
+      <i class="fas fa-hourglass-half"></i> Aguardando contagem favorável (mínimo ${trueCountMinimoParaEntrar}+)
+    </div>`;
+    rodadasObservadas++;
+  }
+
+  resultadoDiv.innerHTML = `
+    <div class="stats-grid">
+      <div class="stat-box">
+        <span class="stat-label"><i class="fas fa-calculator"></i> Contagem Hi-Lo:</span>
+        <span class="stat-value ${contagem > 0 ? 'positive' : contagem < 0 ? 'negative' : ''}">${contagem}</span>
+      </div>
+      
+      <div class="stat-box">
+        <span class="stat-label"><i class="fas fa-layer-group"></i> Baralhos restantes:</span>
+        <span class="stat-value">${baralhosRest.toFixed(2)}</span>
+      </div>
+      
+      <div class="stat-box highlight">
+        <span class="stat-label"><i class="fas fa-star"></i> True Count:</span>
+        <span class="stat-value ${trueCount > 0 ? 'positive' : trueCount < 0 ? 'negative' : ''}">${trueCount}</span>
+      </div>
+      
+      <div class="stat-box">
+        <span class="stat-label"><i class="fas fa-club"></i> Ases restantes:</span>
+        <span class="stat-value">${asesRestantes}</span>
+      </div>
+    </div>
+    
+    ${alertaEntrada}
+    
+    <div class="recommendation-box">
+      <div class="recommendation">
+        <span class="rec-label"><i class="fas fa-coins"></i> Recomendação de aposta:</span>
+        <span class="rec-value">${mostrarRecomendacaoAposta(trueCount)}</span>
+      </div>
+      
+      <div class="recommendation">
+        <span class="rec-label"><i class="fas fa-chess"></i> Jogada recomendada:</span>
+        <span class="rec-value ${jogada.includes('DIVIDIR') ? 'split' : jogada.includes('DOBRAR') ? 'double' : ''}">${jogada}</span>
+      </div>
+    </div>
+    
+    <div class="game-info">
+      <p><i class="fas fa-history"></i> <strong>Rodadas observadas:</strong> ${rodadasObservadas}</p>
+      <p><i class="fas fa-redo"></i> <strong>Rodadas até embaralhar:</strong> ~${estimativaRodadasRestantes}</p>
+    </div>
+    
+    <div class="current-hand">
+      <p><i class="fas fa-hand-paper"></i> <strong>Sua mão:</strong> ${mao.length > 0 ? mao.join(' + ') + ` = ${calcularSoma(mao).total}` : 'Nenhuma carta'}</p>
+      <p><i class="fas fa-robot"></i> <strong>Dealer mostra:</strong> ${dealer || 'Nenhuma carta'}</p>
+    </div>
+  `;
+}
+
+// Exibe notificações temporárias
+function showToast(message, type = 'success') {
+  const toast = document.createElement('div');
+  toast.className = `toast toast-${type}`;
+  toast.innerHTML = `<i class="fas fa-${type === 'error' ? 'exclamation-circle' : 'check-circle'}"></i> ${message}`;
+  document.body.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.classList.add('show');
+    setTimeout(() => {
+      toast.classList.remove('show');
+      setTimeout(() => toast.remove(), 300);
+    }, 3000);
+  }, 100);
+}
+
+// Event Listeners
+baralhosSelect.addEventListener('change', () => { 
+  baralhos = parseInt(baralhosSelect.value); 
+  limpar(); 
+  showToast(`Configurado para ${baralhos} baralhos`, 'success');
+});
+
+limparCartasBtn.addEventListener('click', limpar);
+desfazerCartaBtn.addEventListener('click', desfazerUltimaCarta);
+limparMaoBtn.addEventListener('click', () => {
+  mao = []; 
+  atualizarMao(); 
+  calcularEMostrar();
+  showToast("Mão do jogador limpa", 'success');
+});
+
+// Event Listeners para bankroll
+ganharBtn.addEventListener('click', registrarVitoria);
+perderBtn.addEventListener('click', registrarDerrota);
+resetBankrollBtn.addEventListener('click', resetarBankroll);
+apostaValorInput.addEventListener('change', () => {
+  valorAposta = parseInt(apostaValorInput.value) || 10;
+  localStorage.setItem('blackjackBankroll', JSON.stringify({
+    saldo,
+    vitorias,
+    derrotas,
+    valorAposta
+  }));
+});
+
+// Inicialização
+document.addEventListener('DOMContentLoaded', () => {
+  atualizarHistorico(); 
+  atualizarMao(); 
+  atualizarDealer();
+  carregarBankroll();
+  showToast("Bem-vindo ao Blackjack Pro Trainer!", 'success');
+});
+</script>
+
+</body>
+</html>
