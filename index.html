@@ -50,6 +50,14 @@
       margin-bottom: 2rem;
     }
 
+    .header-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+      position: relative;
+    }
+
     h1 {
       font-family: 'Playfair Display', serif;
       font-size: 2.8rem;
@@ -78,6 +86,38 @@
     .subtitle {
       color: var(--text-muted);
       font-size: 1.1rem;
+    }
+
+    .hamburger {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #fff;
+      display: none;
+    }
+
+    .nav-menu {
+      display: flex;
+    }
+
+    .nav-menu ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      gap: 20px;
+    }
+
+    .nav-menu ul li a {
+      color: #fff;
+      text-decoration: none;
+      font-size: 16px;
+      transition: color 0.3s;
+    }
+
+    .nav-menu ul li a:hover {
+      color: #ffd700;
     }
 
     .container {
@@ -374,6 +414,7 @@
       box-shadow: 0 0 0 3px rgba(106, 17, 203, 0.3);
     }
 
+    /* Estilos para dispositivos móveis */
     @media (max-width: 768px) {
       body {
         padding: 1rem;
@@ -411,6 +452,37 @@
 
       .stats-grid {
         grid-template-columns: 1fr;
+      }
+
+      .hamburger {
+        display: block;
+      }
+
+      .nav-menu {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background: var(--darker-bg);
+        padding: 20px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+      }
+
+      .nav-menu.active {
+        display: block;
+      }
+
+      .nav-menu ul {
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .nav-menu ul li a {
+        display: block;
+        padding: 10px;
+        font-size: 18px;
       }
     }
 
@@ -481,8 +553,23 @@
 
 <div class="app-container">
   <header>
-    <h1><i class="fas fa-cards"></i> Blackjack Pro Trainer</h1>
-    <p class="subtitle">Treinador profissional para contagem de cartas Hi-Lo</p>
+    <div class="header-container">
+      <div>
+        <h1><i class="fas fa-cards"></i> Blackjack Pro Trainer</h1>
+        <p class="subtitle">Treinador profissional para contagem de cartas Hi-Lo</p>
+      </div>
+      <button class="hamburger" id="hamburger">
+        <i class="fas fa-bars"></i>
+      </button>
+      <nav class="nav-menu" id="nav-menu">
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="surebet.html">Método Surebet</a></li>
+          <li><a href="#about">Sobre</a></li>
+          <li><a href="#contact">Contato</a></li>
+        </ul>
+      </nav>
+    </div>
   </header>
 
   <main>
@@ -613,7 +700,7 @@ const NAIPES_MAO = {
   '4': ['♥', '♠'],
   '5': ['♦', '♣'],
   '6': ['♥', '♠'],
-  '7': ['♥', '♠'], // Exemplo: 7 de Copas e 7 de Paus
+  '7': ['♥', '♠'],
   '8': ['♦', '♣'],
   '9': ['♥', '♠'],
   '10': ['♦', '♣'],
@@ -623,7 +710,7 @@ const NAIPES_MAO = {
   'A': ['♦', '♣']
 };
 
-// Naipes para histórico e dealer (mantidos como antes)
+// Naipes para histórico e dealer
 const NAIPES = {
   '2': '♦', '3': '♥', '4': '♠', '5': '♣', '6': '♦',
   '7': '♥', '8': '♠', '9': '♣', '10': '♦',
@@ -634,7 +721,7 @@ const NAIPES = {
 let baralhos = 6;
 let historico = {}; 
 let cartasHistorico = []; 
-let mao = []; // Armazena objetos {valor, naipe}
+let mao = [];
 let dealer = null;
 const trueCountMinimoParaEntrar = 1;
 const cartasPorRodadaMedia = 10;
@@ -663,6 +750,13 @@ const saldoDisplay = document.getElementById('saldo-display');
 const vitoriasDisplay = document.getElementById('vitorias-display');
 const derrotasDisplay = document.getElementById('derrotas-display');
 const taxaVitoriasDisplay = document.getElementById('taxa-vitorias-display');
+const hamburger = document.getElementById('hamburger');
+const navMenu = document.getElementById('nav-menu');
+
+// Função para alternar o menu hambúrguer
+function toggleMenu() {
+  navMenu.classList.toggle('active');
+}
 
 // Funções de bankroll
 function atualizarBankroll() {
@@ -674,7 +768,6 @@ function atualizarBankroll() {
   const taxaVitorias = totalJogos > 0 ? Math.round((vitorias / totalJogos) * 100) : 0;
   taxaVitoriasDisplay.textContent = `${taxaVitorias}%`;
   
-  // Salvar no localStorage
   localStorage.setItem('blackjackBankroll', JSON.stringify({
     saldo,
     vitorias,
@@ -731,7 +824,6 @@ function criarBotaoCarta(carta, naipe, handler, selected = false, isDealer = fal
   if(selected) btn.classList.add('selected');
   if(isDealer) btn.classList.add('dealer-card');
   
-  // Determinar cor baseada no naipe
   const isRed = naipe === '♦' || naipe === '♥';
   if(isRed) btn.classList.add('vermelho');
   
@@ -769,7 +861,6 @@ function selecionarCartaMao(carta, naipe) {
   const mesmaCarta = mao.filter(c => c.valor === carta && c.naipe === naipe).length;
   
   if (mesmaCarta > 0) {
-    // Remove se já estiver selecionada com o mesmo naipe
     mao = mao.filter(c => !(c.valor === carta && c.naipe === naipe));
   } else if (mao.length < 3) {
     mao.push(cartaObj);
@@ -849,7 +940,6 @@ function calcularSoma(mao) {
     else total += parseInt(carta.valor);
   }
   
-  // Ajuste para ases
   while(total > 21 && ases > 0) { 
     total -= 10; 
     ases--; 
@@ -901,17 +991,14 @@ function decidirJogadaAvancada(mao, dealer, trueCount) {
   const {total, suave, isBlackjack} = calcularSoma(mao);
   const d = dealer;
   
-  // Blackjack automatico
   if(isBlackjack) return "⭐ BLACKJACK! Pague 3:2";
   
-  // Desvios avançados baseados na contagem verdadeira
   if(total === 16 && d === '10' && trueCount >= 0) return "🔄 Parar (normalmente pedir, mas TC ≥ 0)";
   if(total === 15 && d === '10' && trueCount >= 4) return "🔄 Parar (TC ≥ 4)";
   if(suave && total === 18 && d === '2' && trueCount >= 1) return "🔄 Parar (A,7 vs 2, TC ≥ 1)";
   if(total === 10 && d === '10' && trueCount >= 4) return "🔄 Dobrar (normalmente não, mas TC ≥ 4)";
   if(total === 12 && ['2','3'].includes(d) && trueCount >= 3) return "🔄 Parar (normalmente pedir, mas TC ≥ 3)";
   
-  // Pares
   if(mao.length === 2 && mao[0].valor === mao[1].valor) {
     const par = mao[0].valor;
     if(par === 'A' || par === '8') return "✂️ DIVIDIR";
@@ -924,7 +1011,6 @@ function decidirJogadaAvancada(mao, dealer, trueCount) {
     }
   }
   
-  // Mãos suaves (com Ás)
   if(suave) {
     if(total >= 19) return "🛑 PARAR";
     if(total === 18) {
@@ -938,7 +1024,6 @@ function decidirJogadaAvancada(mao, dealer, trueCount) {
     }
   }
   
-  // Mãos duras (sem Ás ou Ás contado como 1)
   if(total >= 17) return "🛑 PARAR";
   if(total >= 13 && ['2','3','4','5','6'].includes(d)) return "🛑 PARAR";
   if(total === 12 && ['4','5','6'].includes(d)) return "🛑 PARAR";
@@ -949,7 +1034,6 @@ function decidirJogadaAvancada(mao, dealer, trueCount) {
     return "📢 PEDIR";
   }
   
-  // Default
   return "📢 PEDIR";
 }
 
@@ -1059,7 +1143,6 @@ limparMaoBtn.addEventListener('click', () => {
   showToast("Mão do jogador limpa", 'success');
 });
 
-// Event Listeners para bankroll
 ganharBtn.addEventListener('click', registrarVitoria);
 perderBtn.addEventListener('click', registrarDerrota);
 resetBankrollBtn.addEventListener('click', resetarBankroll);
@@ -1072,6 +1155,8 @@ apostaValorInput.addEventListener('change', () => {
     valorAposta
   }));
 });
+
+hamburger.addEventListener('click', toggleMenu);
 
 document.addEventListener('DOMContentLoaded', () => {
   atualizarHistorico(); 
