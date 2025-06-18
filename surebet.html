@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Surebet Calculator Pro - Brasileirão 2025</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-gradient: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+      --danger-gradient: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
+      --success-gradient: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+      --dark-bg: #0f172a;
+      --card-bg: rgba(30, 41, 59, 0.8);
+      --text-light: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-radius: 12px;
+      --box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: var(--dark-bg);
+      color: var(--text-light);
+      min-height: 100vh;
+      line-height: 1.6;
+      padding: 2rem;
+      background-image: 
+        radial-gradient(at 80% 0%, rgba(39, 51, 89, 0.5) 0px, transparent 50%),
+        radial-gradient(at 0% 50%, rgba(106, 17, 203, 0.3) 0px, transparent 50%);
+    }
+    .app-container {
+      max-width: 800px;
+      margin: 0 auto;
+      animation: fadeIn 0.6s ease-out forwards;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(90deg, #ff8a00, #e52e71, #6a11cb);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      position: relative;
+      padding-bottom: 1rem;
+    }
+    h1::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 200px;
+      height: 4px;
+      background: linear-gradient(90deg, transparent, #ff8a00, #e52e71, transparent);
+      border-radius: 2px;
+    }
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+    }
+    .container {
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      border-radius: var(--border-radius);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: var(--box-shadow);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      transition: var(--transition);
+    }
+    .container:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+    }
+    .input-group {
+      margin-bottom: 1.25rem;
+    }
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: var(--text-light);
+    }
+    input[type="number"], 
+    input[type="text"] {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      font-size: 1rem;
+      border-radius: var(--border-radius);
+      border: none;
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text-light);
+      transition: var(--transition);
+    }
+    input[type="number"]:focus, 
+    input[type="text"]:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(106, 17, 203, 0.3);
+      background: rgba(255, 255, 255, 0.15);
+    }
+    .button-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin: 1.5rem 0;
+    }
+    .btn {
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      border: none;
+      border-radius: var(--border-radius);
+      color: white;
+      cursor: pointer;
+      transition: var(--transition);
+      box-shadow: var(--box-shadow);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    .btn i {
+      font-size: 1.2rem;
+    }
+    .btn-primary {
+      background: var(--primary-gradient);
+    }
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #5a0db5 0%, #1a65e5 100%);
+    }
+    .btn-danger {
+      background: var(--danger-gradient);
+    }
+    .btn-danger:hover {
+      background: linear-gradient(135deg, #e5385c 0%, #e53a1b 100%);
+    }
+    .btn-outline {
+      background: transparent;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      color: var(--text-light);
+    }
+    .btn-outline:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+    .results-box {
+      background: rgba(15, 23, 42, 0.7);
+      padding: 1.5rem;
+      border-radius: var(--border-radius);
+      font-size: 1rem;
+      line-height: 1.7;
+      color: var(--text-light);
+      border-left: 4px solid #6a11cb;
+      margin-top: 1rem;
+    }
+    .history-box {
+      background: rgba(15, 23, 42, 0.7);
+      padding: 1.5rem;
+      border-radius: var(--border-radius);
+      font-size: 1rem;
+      line-height: 1.7;
+      color: var(--text-light);
+      border-left: 4px solid #2575fc;
+      margin-top: 1rem;
+    }
+    .alert {
+      padding: 1rem;
+      border-radius: var(--border-radius);
+      margin: 1rem 0;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .alert-success {
+      background: rgba(56, 239, 125, 0.1);
+      border: 1px solid rgba(56, 239, 125, 0.3);
+      color: #38ef7d;
+    }
+    .alert-error {
+      background: rgba(255, 75, 43, 0.1);
+      border: 1px solid rgba(255, 75, 43, 0.3);
+      color: #ff4b2b;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    .stat-box {
+      background: rgba(30, 41, 59, 0.5);
+      padding: 1rem;
+      border-radius: 8px;
+      text-align: center;
+      transition: var(--transition);
+    }
+    .stat-box.highlight {
+      background: rgba(106, 17, 203, 0.2);
+      border: 1px solid rgba(106, 17, 203, 0.3);
+      transform: translateY(-3px);
+    }
+    .stat-label {
+      display: block;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 0.25rem;
+    }
+    .stat-value {
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+    .stat-value.positive {
+      color: #38ef7d;
+    }
+    .history-item {
+      margin: 1rem 0;
+      padding: 1rem;
+      background: rgba(30, 41, 59, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: var(--border-radius);
+      transition: var(--transition);
+    }
+    .history-item:hover {
+      background: rgba(30, 41, 59, 0.7);
+      transform: translateY(-3px);
+    }
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 1rem 1.5rem;
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      z-index: 1000;
+      opacity: 0;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .toast.show {
+      bottom: 30px;
+      opacity: 1;
+    }
+    .toast-success {
+      background: rgba(56, 239, 125, 0.9);
+    }
+    .toast-error {
+      background: rgba(255, 75, 43, 0.9);
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    .modal.show {
+      display: flex;
+    }
+    .modal-content {
+      background: var(--card-bg);
+      border-radius: var(--border-radius);
+      padding: 2rem;
+      max-width: 600px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: var(--box-shadow);
+      position: relative;
+    }
+    .modal-close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: none;
+      border: none;
+      color: var(--text-light);
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+    .modal-game {
+      margin: 1rem 0;
+      padding: 1rem;
+      background: rgba(30, 41, 59, 0.5);
+      border-radius: 8px;
+    }
+    .modal-game h3 {
+      margin-bottom: 0.5rem;
+      color: #38ef7d;
+    }
+    .modal-game p {
+      margin: 0.25rem 0;
+    }
+    .modal-game .btn {
+      margin-top: 0.5rem;
+    }
+    .custom-odds {
+      margin-top: 1rem;
+    }
+    @media (max-width: 768px) {
+      body {
+        padding: 1rem;
+      }
+      h1 {
+        font-size: 2rem;
+      }
+      .container {
+        padding: 1rem;
+      }
+      .button-group {
+        flex-direction: column;
+      }
+      .btn {
+        width: 100%;
+      }
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+    .btn-pulse {
+      animation: pulse 2s infinite;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <header>
+      <h1><i class="fas fa-calculator"></i> Surebet Calculator Pro</h1>
+      <p class="subtitle">Calcule apostas de arbitragem para lucro garantido no Brasileirão 2025</p>
+    </header>
+    <main>
+      <section class="container">
+        <div class="input-group">
+          <button id="open-games-btn" class="btn btn-primary"><i class="fas fa-futbol"></i> Escolher Jogo do Brasileirão</button>
+        </div>
+        <div id="outcome-inputs">
+          <div class="input-group outcome">
+            <label for="name1">Nome do Resultado 1:</label>
+            <input type="text" id="name1" value="Vitória Casa">
+            <label for="odds1">Odds Vitória Casa:</label>
+            <input type="number" id="odds1" step="0.01" min="1" value="2.20">
+          </div>
+          <div class="input-group outcome">
+            <label for="name2">Nome do Resultado 2:</label>
+            <input type="text" id="name2" value="Empate">
+            <label for="odds2">Odds Empate:</label>
+            <input type="number" id="odds2" step="0.01" min="1" value="3.40">
+          </div>
+          <div class="input-group outcome">
+            <label for="name3">Nome do Resultado 3:</label>
+            <input type="text" id="name3" value="Vitória Fora">
+            <label for="odds3">Odds Vitória Fora:</label>
+            <input type="number" id="odds3" step="0.01" min="1" value="3.60">
+          </div>
+        </div>
+        <div class="input-group">
+          <label for="totalStake">Valor Total a Apostar (R$):</label>
+          <input type="number" id="totalStake" min="1" value="100">
+        </div>
+        <div class="button-group">
+          <button id="calcular-btn" class="btn btn-primary btn-pulse"><i class="fas fa-calculator"></i> Calcular Surebet</button>
+          <button id="reset-btn" class="btn btn-outline"><i class="fas fa-sync-alt"></i> Resetar</button>
+          <button id="clear-history-btn" class="btn btn-danger"><i class="fas fa-trash"></i> Limpar Histórico</button>
+        </div>
+      </section>
+
+      <section class="container">
+        <h2><i class="fas fa-chart-line"></i> Resultados</h2>
+        <div id="resultado" class="results-box"></div>
+      </section>
+
+      <section class="container">
+        <h2><i class="fas fa-history"></i> Histórico de Cálculos</h2>
+        <div id="historico" class="history-box"></div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Modal de Jogos do Brasileirão -->
+  <div id="games-modal" class="modal">
+    <div class="modal-content">
+      <button class="modal-close"><i class="fas fa-times"></i></button>
+      <h2><i class="fas fa-futbol"></i> Jogos do Brasileirão 2025</h2>
+      <div id="games-list"></div>
+      <div class="custom-odds">
+        <h3>Odds Personalizadas</h3>
+        <div class="input-group">
+          <label for="custom-odds1">Odd Vitória Casa:</label>
+          <input type="number" id="custom-odds1" step="0.01" min="1" placeholder="Ex.: 2.20">
+        </div>
+        <div class="input-group">
+          <label for="custom-odds2">Odd Empate:</label>
+          <input type="number" id="custom-odds2" step="0.01" min="1" placeholder="Ex.: 3.40">
+        </div>
+        <div class="input-group">
+          <label for="custom-odds3">Odd Vitória Fora:</label>
+          <input type="number" id="custom-odds3" step="0.01" min="1" placeholder="Ex.: 3.60">
+        </div>
+        <button id="use-custom-odds" class="btn btn-primary"><i class="fas fa-check"></i> Usar Odds Personalizadas</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Elementos DOM
+    const openGamesBtn = document.getElementById('open-games-btn');
+    const gamesModal = document.getElementById('games-modal');
+    const modalClose = document.querySelector('.modal-close');
+    const gamesList = document.getElementById('games-list');
+    const useCustomOddsBtn = document.getElementById('use-custom-odds');
+    const calcularBtn = document.getElementById('calcular-btn');
+    const resetBtn = document.getElementById('reset-btn');
+    const clearHistoryBtn = document.getElementById('clear-history-btn');
+    const totalStakeInput = document.getElementById('totalStake');
+    const resultadoDiv = document.getElementById('resultado');
+    const historicoDiv = document.getElementById('historico');
+
+    // Estado do histórico
+    let historicoCalculos = JSON.parse(localStorage.getItem('surebetHistory')) || [];
+    let selectedGameName = '';
+
+    // Jogos simulados do Brasileirão com odds e palpites
+    function getBrasileiraoGames() {
+      return [
+        { 
+          id: 'game1', 
+          name: 'Flamengo vs Corinthians', 
+          outcomes: ['Flamengo', 'Empate', 'Corinthians'], 
+          odds: [1.85, 3.50, 4.50], 
+          tips: {
+            '1x2': 'Flamengo (1.85) - Flamengo é favorito em casa, com histórico forte no Maracanã.',
+            'BTTS': 'Sim (1.90) - Ambas as equipes marcaram em 4 dos últimos 5 confrontos.',
+            'Over/Under 2.5': 'Mais de 2.5 (1.80) - Jogos do Flamengo em casa têm média de 3.2 gols.'
+          }
+        },
+        { 
+          id: 'game2', 
+          name: 'Palmeiras vs São Paulo', 
+          outcomes: ['Palmeiras', 'Empate', 'São Paulo'], 
+          odds: [1.90, 3.40, 4.30], 
+          tips: {
+            '1x2': 'Palmeiras (1.90) - Palmeiras tem vantagem em casa e venceu 3 dos últimos 5 jogos contra o São Paulo.',
+            'BTTS': 'Não (1.85) - Palmeiras tem defesa sólida, com 8 clean sheets nos últimos 10 jogos.',
+            'Over/Under 2.5': 'Menos de 2.5 (2.00) - Clássicos recentes têm sido mais disputados, com poucos gols.'
+          }
+        },
+        { 
+          id: 'game3', 
+          name: 'Grêmio vs Internacional', 
+          outcomes: ['Grêmio', 'Empate', 'Internacional'], 
+          odds: [2.10, 3.30, 3.80], 
+          tips: {
+            '1x2': 'Empate (3.30) - Clássico Gre-Nal costuma ser equilibrado, com 3 empates nos últimos 5 jogos.',
+            'BTTS': 'Sim (1.95) - Ambos marcaram em 4 dos últimos 5 Gre-Nais.',
+            'Over/Under 2.5': 'Mais de 2.5 (1.85) - Gre-Nais têm média de 2.8 gols por jogo.'
+          }
+        },
+        { 
+          id: 'game4', 
+          name: 'Atlético-MG vs Cruzeiro', 
+          outcomes: ['Atlético-MG', 'Empate', 'Cruzeiro'], 
+          odds: [1.95, 3.45, 4.20], 
+          tips: {
+            '1x2': 'Atlético-MG (1.95) - Atlético é forte em casa e venceu 2 dos últimos 3 clássicos.',
+            'BTTS': 'Sim (1.90) - Ambos marcaram em 3 dos últimos 4 confrontos.',
+            'Over/Under 2.5': 'Mais de 2.5 (1.85) - Clássicos mineiros têm média de 3.0 gols.'
+          }
+        },
+        { 
+          id: 'game5', 
+          name: 'Botafogo vs Fluminense', 
+          outcomes: ['Botafogo', 'Empate', 'Fluminense'], 
+          odds: [2.05, 3.35, 3.90], 
+          tips: {
+            '1x2': 'Botafogo (2.05) - Botafogo está em boa fase e venceu 3 dos últimos 5 jogos em casa.',
+            'BTTS': 'Sim (1.95) - Ambos marcaram em 4 dos últimos 5 confrontos.',
+            'Over/Under 2.5': 'Mais de 2.5 (1.90) - Jogos do Botafogo em casa têm média de 2.9 gols.'
+          }
+        }
+      ];
+    }
+
+    // Exibe jogos no modal com palpites
+    function mostrarJogos() {
+      gamesList.innerHTML = '';
+      const games = getBrasileiraoGames();
+      games.forEach(game => {
+        const gameDiv = document.createElement('div');
+        gameDiv.className = 'modal-game';
+        gameDiv.innerHTML = `
+          <h3>${game.name}</h3>
+          <p>Vitória Casa: ${game.outcomes[0]} @ ${game.odds[0].toFixed(2)}</p>
+          <p>Empate: ${game.outcomes[1]} @ ${game.odds[1].toFixed(2)}</p>
+          <p>Vitória Fora: ${game.outcomes[2]} @ ${game.odds[2].toFixed(2)}</p>
+          <p><strong>Palpites:</strong></p>
+          <p><i class="fas fa-futbol"></i> 1x2: ${game.tips['1x2']}</p>
+          <p><i class="fas fa-exchange-alt"></i> BTTS: ${game.tips['BTTS']}</p>
+          <p><i class="fas fa-chart-line"></i> Over/Under 2.5: ${game.tips['Over/Under 2.5']}</p>
+          <button class="btn btn-primary select-game" data-game-id="${game.id}"><i class="fas fa-check"></i> Selecionar Jogo</button>
+        `;
+        gamesList.appendChild(gameDiv);
+      });
+
+      // Adiciona eventos aos botões de seleção
+      document.querySelectorAll('.select-game').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const gameId = btn.getAttribute('data-game-id');
+          const game = getBrasileiraoGames().find(g => g.id === gameId);
+          document.getElementById('name1').value = game.outcomes[0];
+          document.getElementById('odds1').value = game.odds[0].toFixed(2);
+          document.getElementById('name2').value = game.outcomes[1];
+          document.getElementById('odds2').value = game.odds[1].toFixed(2);
+          document.getElementById('name3').value = game.outcomes[2];
+          document.getElementById('odds3').value = game.odds[2].toFixed(2);
+          selectedGameName = game.name;
+          gamesModal.classList.remove('show');
+          showToast(`Jogo ${game.name} selecionado!`, 'success');
+        });
+      });
+    }
+
+    // Calcula a surebet
+    function calcularSurebet() {
+      const outcomes = [];
+      for (let i = 1; i <= 3; i++) {
+        const name = document.getElementById(`name${i}`).value.trim();
+        const odds = parseFloat(document.getElementById(`odds${i}`).value);
+        if (!name || isNaN(odds) || odds < 1) {
+          showToast(`Preencha o nome e odds válidas para o Resultado ${i}`, 'error');
+          return;
+        }
+        outcomes.push({ name, odds });
+      }
+
+      const totalStake = parseFloat(totalStakeInput.value);
+      if (isNaN(totalStake) || totalStake <= 0) {
+        showToast('Insira um valor total de aposta válido', 'error');
+        return;
+      }
+
+      // Calcular probabilidades implícitas
+      const totalProb = outcomes.reduce((sum, outcome) => sum + (1 / outcome.odds), 0);
+
+      if (totalProb >= 1) {
+        resultadoDiv.innerHTML = `
+          <div class="alert alert-error">
+            <i class="fas fa-exclamation-circle"></i> Não é uma surebet! Margem da casa: ${((totalProb - 1) * 100).toFixed(2)}%
+          </div>
+        `;
+        showToast('Não há oportunidade de surebet com essas odds', 'error');
+        return;
+      }
+
+      // Calcular valores a apostar
+      const apostas = outcomes.map(outcome => ({
+        nome: outcome.name,
+        odds: outcome.odds,
+        valor: (totalStake * (1 / outcome.odds)) / totalProb
+      }));
+
+      // Calcular retorno fixo
+      const retornoFixo = apostas[0].valor * apostas[0].odds;
+      const lucro = retornoFixo - totalStake;
+      const lucroPercentual = (lucro / totalStake) * 100;
+      const margin = (1 - totalProb) * 100;
+
+      // Exibir resultados com palpites
+      const game = getBrasileiraoGames().find(g => g.name === selectedGameName);
+      resultadoDiv.innerHTML = `
+        <div class="alert alert-success">
+          <i class="fas fa-check-circle"></i> Surebet encontrada! Margem: ${margin.toFixed(2)}%
+        </div>
+        ${selectedGameName ? `<p><strong>Jogo:</strong> ${selectedGameName}</p>` : ''}
+        <div class="stats-grid">
+          ${apostas.map(aposta => `
+            <div class="stat-box">
+              <span class="stat-label"><i class="fas fa-coins"></i> Aposta ${aposta.nome}</span>
+              <span class="stat-value">R$ ${aposta.valor.toFixed(2)}</span>
+              <span class="stat-label">Odds: ${aposta.odds}</span>
+            </div>
+          `).join('')}
+          <div class="stat-box highlight">
+            <span class="stat-label"><i class="fas fa-dollar-sign"></i> Retorno Fixo</span>
+            <span class="stat-value">R$ ${retornoFixo.toFixed(2)}</span>
+          </div>
+          <div class="stat-box highlight">
+            <span class="stat-label"><i class="fas fa-trophy"></i> Lucro Garantido</span>
+            <span class="stat-value positive">R$ ${lucro.toFixed(2)} (${lucroPercentual.toFixed(2)}%)</span>
+          </div>
+        </div>
+        ${game ? `
+          <p><strong>Palpites para ${game.name}:</strong></p>
+          <p><i class="fas fa-futbol"></i> 1x2: ${game.tips['1x2']}</p>
+          <p><i class="fas fa-exchange-alt"></i> BTTS: ${game.tips['BTTS']}</p>
+          <p><i class="fas fa-chart-line"></i> Over/Under 2.5: ${game.tips['Over/Under 2.5']}</p>
+        ` : ''}
+      `;
+
+      // Salvar no histórico
+      historicoCalculos.push({
+        timestamp: new Date().toISOString(),
+        totalStake,
+        margin,
+        lucro,
+        lucroPercentual,
+        apostas,
+        gameName: selectedGameName
+      });
+      localStorage.setItem('surebetHistory', JSON.stringify(historicoCalculos));
+      carregarHistorico();
+      showToast('Surebet calculada com sucesso!', 'success');
+    }
+
+    // Carrega o histórico
+    function carregarHistorico() {
+      historicoDiv.innerHTML = '';
+      if (historicoCalculos.length === 0) {
+        historicoDiv.innerHTML = '<p>Nenhum cálculo no histórico.</p>';
+        return;
+      }
+      
+      historicoCalculos.slice().reverse().forEach((calculo, index) => {
+        const item = document.createElement('div');
+        item.className = 'history-item';
+        item.innerHTML = `
+          <p><strong><i class="far fa-calendar-alt"></i> ${new Date(calculo.timestamp).toLocaleString()}</strong></p>
+          ${calculo.gameName ? `<p><strong>Jogo:</strong> ${calculo.gameName}</p>` : ''}
+          <div class="stats-grid">
+            <div class="stat-box highlight">
+              <span class="stat-label"><i class="fas fa-coins"></i> Total Apostado</span>
+              <span class="stat-value">R$ ${calculo.totalStake.toFixed(2)}</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-label"><i class="fas fa-percentage"></i> Margem</span>
+              <span class="stat-value positive">${calculo.margin.toFixed(2)}%</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-label"><i class="fas fa-dollar-sign"></i> Lucro</span>
+              <span class="stat-value positive">R$ ${calculo.lucro.toFixed(2)}</span>
+            </div>
+          </div>
+          <p><i class="fas fa-info-circle"></i> <strong>Apostas:</strong> ${calculo.apostas.map(a => `${a.nome}: R$ ${a.valor.toFixed(2)} @ ${a.odds}`).join(', ')}</p>
+        `;
+        historicoDiv.appendChild(item);
+      });
+    }
+
+    // Reseta os campos
+    function resetarCampos() {
+      document.getElementById('name1').value = 'Vitória Casa';
+      document.getElementById('odds1').value = '2.20';
+      document.getElementById('name2').value = 'Empate';
+      document.getElementById('odds2').value = '3.40';
+      document.getElementById('name3').value = 'Vitória Fora';
+      document.getElementById('odds3').value = '3.60';
+      totalStakeInput.value = '100';
+      selectedGameName = '';
+      resultadoDiv.innerHTML = '';
+      showToast('Campos resetados', 'success');
+    }
+
+    // Limpa o histórico
+    function limparHistorico() {
+      if (confirm('Tem certeza que deseja limpar o histórico de cálculos?')) {
+        historicoCalculos = [];
+        localStorage.setItem('surebetHistory', JSON.stringify(historicoCalculos));
+        carregarHistorico();
+        showToast('Histórico limpo com sucesso', 'success');
+      }
+    }
+
+    // Exibe notificações
+    function showToast(message, type = 'success') {
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+      toast.innerHTML = `<i class="fas fa-${type === 'error' ? 'exclamation-circle' : 'check-circle'}"></i> ${message}`;
+      document.body.appendChild(toast);
+
+      setTimeout(() => {
+        toast.classList.add('show');
+        setTimeout(() => {
+          toast.classList.remove('show');
+          setTimeout(() => toast.remove(), 300);
+        }, 3000);
+      }, 100);
+    }
+
+    // Controle do modal
+    openGamesBtn.addEventListener('click', () => {
+      gamesModal.classList.add('show');
+      mostrarJogos();
+    });
+
+    modalClose.addEventListener('click', () => {
+      gamesModal.classList.remove('show');
+    });
+
+    // Usar odds personalizadas
+    useCustomOddsBtn.addEventListener('click', () => {
+      const odds1 = parseFloat(document.getElementById('custom-odds1').value);
+      const odds2 = parseFloat(document.getElementById('custom-odds2').value);
+      const odds3 = parseFloat(document.getElementById('custom-odds3').value);
+      if (isNaN(odds1) || isNaN(odds2) || isNaN(odds3) || odds1 < 1 || odds2 < 1 || odds3 < 1) {
+        showToast('Insira odds válidas para todos os resultados', 'error');
+        return;
+      }
+      document.getElementById('name1').value = 'Vitória Casa';
+      document.getElementById('odds1').value = odds1.toFixed(2);
+      document.getElementById('name2').value = 'Empate';
+      document.getElementById('odds2').value = odds2.toFixed(2);
+      document.getElementById('name3').value = 'Vitória Fora';
+      document.getElementById('odds3').value = odds3.toFixed(2);
+      selectedGameName = 'Odds Personalizadas';
+      gamesModal.classList.remove('show');
+      showToast('Odds personalizadas aplicadas!', 'success');
+    });
+
+    // Event Listeners
+    calcularBtn.addEventListener('click', calcularSurebet);
+    resetBtn.addEventListener('click', resetarCampos);
+    clearHistoryBtn.addEventListener('click', limparHistorico);
+
+    // Inicialização
+    document.addEventListener('DOMContentLoaded', () => {
+      carregarHistorico();
+      showToast('Bem-vindo ao Surebet Calculator Pro!', 'success');
+    });
+  </script>
+</body>
+</html>

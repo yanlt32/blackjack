@@ -6,7 +6,6 @@
   <title>Blackjack Pro Trainer</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    /* Seus estilos CSS aqui */
     :root {
       --primary-gradient: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
       --danger-gradient: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
@@ -434,7 +433,6 @@
       animation: pulse 2s infinite;
     }
 
-    /* Estilos para o bankroll */
     .bankroll-controls {
       display: flex;
       flex-wrap: wrap;
@@ -594,7 +592,7 @@
   </main>
 
   <footer>
-    <p>Blackjack Pro Trainer &copy; 2023 - Sistema Hi-Lo para contagem de cartas</p>
+    <p>Blackjack Pro Trainer © 2023 - Sistema Hi-Lo para contagem de cartas</p>
   </footer>
 </div>
 
@@ -607,6 +605,25 @@ const VALORES_HILO = {
 };
 
 const TODAS_CARTAS = ['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
+
+// Definir dois naipes por carta para a mão do jogador
+const NAIPES_MAO = {
+  '2': ['♥', '♠'],
+  '3': ['♦', '♣'],
+  '4': ['♥', '♠'],
+  '5': ['♦', '♣'],
+  '6': ['♥', '♠'],
+  '7': ['♥', '♠'], // Exemplo: 7 de Copas e 7 de Paus
+  '8': ['♦', '♣'],
+  '9': ['♥', '♠'],
+  '10': ['♦', '♣'],
+  'J': ['♥', '♠'],
+  'Q': ['♦', '♣'],
+  'K': ['♥', '♠'],
+  'A': ['♦', '♣']
+};
+
+// Naipes para histórico e dealer (mantidos como antes)
 const NAIPES = {
   '2': '♦', '3': '♥', '4': '♠', '5': '♣', '6': '♦',
   '7': '♥', '8': '♠', '9': '♣', '10': '♦',
@@ -617,7 +634,7 @@ const NAIPES = {
 let baralhos = 6;
 let historico = {}; 
 let cartasHistorico = []; 
-let mao = []; 
+let mao = []; // Armazena objetos {valor, naipe}
 let dealer = null;
 const trueCountMinimoParaEntrar = 1;
 const cartasPorRodadaMedia = 10;
@@ -708,14 +725,13 @@ function resetarBankroll() {
 }
 
 // Função para criar botões de carta
-function criarBotaoCarta(carta, handler, selected = false, isDealer = false) {
+function criarBotaoCarta(carta, naipe, handler, selected = false, isDealer = false) {
   const btn = document.createElement('button');
   btn.className = 'carta-btn';
   if(selected) btn.classList.add('selected');
   if(isDealer) btn.classList.add('dealer-card');
   
   // Determinar cor baseada no naipe
-  const naipe = NAIPES[carta];
   const isRed = naipe === '♦' || naipe === '♥';
   if(isRed) btn.classList.add('vermelho');
   
@@ -724,7 +740,7 @@ function criarBotaoCarta(carta, handler, selected = false, isDealer = false) {
     <span class="carta-naipe">${naipe}</span>
   `;
   
-  btn.onclick = () => handler(carta);
+  btn.onclick = () => handler(carta, naipe);
   return btn;
 }
 
@@ -733,7 +749,7 @@ function atualizarHistorico() {
   cartasVistasDiv.innerHTML = '';
   TODAS_CARTAS.forEach(carta => {
     const qtd = historico[carta] || 0;
-    const btn = criarBotaoCarta(carta, (c) => {
+    const btn = criarBotaoCarta(carta, NAIPES[carta], (c) => {
       historico[c] = (historico[c] || 0) + 1;
       cartasHistorico.push(c);
       atualizarHistorico(); 
@@ -748,12 +764,15 @@ function atualizarHistorico() {
 }
 
 // Gerencia a seleção de cartas na mão do jogador
-function selecionarCartaMao(carta) {
-  if(mao.includes(carta)) {
-    // Remove se já estiver selecionada
-    mao = mao.filter(c => c !== carta);
-  } else if(mao.length < 3) {
-    mao.push(carta);
+function selecionarCartaMao(carta, naipe) {
+  const cartaObj = { valor: carta, naipe: naipe };
+  const mesmaCarta = mao.filter(c => c.valor === carta && c.naipe === naipe).length;
+  
+  if (mesmaCarta > 0) {
+    // Remove se já estiver selecionada com o mesmo naipe
+    mao = mao.filter(c => !(c.valor === carta && c.naipe === naipe));
+  } else if (mao.length < 3) {
+    mao.push(cartaObj);
   } else {
     showToast('Você pode selecionar no máximo 3 cartas para sua mão');
     return;
@@ -766,8 +785,10 @@ function selecionarCartaMao(carta) {
 function atualizarMao() {
   maoDiv.innerHTML = '';
   TODAS_CARTAS.forEach(carta => {
-    const selected = mao.includes(carta);
-    maoDiv.appendChild(criarBotaoCarta(carta, selecionarCartaMao, selected));
+    NAIPES_MAO[carta].forEach(naipe => {
+      const selected = mao.some(c => c.valor === carta && c.naipe === naipe);
+      maoDiv.appendChild(criarBotaoCarta(carta, naipe, selecionarCartaMao, selected));
+    });
   });
 }
 
@@ -783,7 +804,7 @@ function atualizarDealer() {
   dealerDiv.innerHTML = '';
   TODAS_CARTAS.forEach(carta => {
     const selected = dealer === carta;
-    dealerDiv.appendChild(criarBotaoCarta(carta, selecionarCartaDealer, selected, true));
+    dealerDiv.appendChild(criarBotaoCarta(carta, NAIPES[carta], selecionarCartaDealer, selected, true));
   });
 }
 
@@ -823,9 +844,9 @@ function calcularSoma(mao) {
   let total = 0, ases = 0;
   
   for(const carta of mao) {
-    if(['J','Q','K'].includes(carta)) total += 10;
-    else if(carta === 'A') { ases++; total += 11; }
-    else total += parseInt(carta);
+    if(['J','Q','K'].includes(carta.valor)) total += 10;
+    else if(carta.valor === 'A') { ases++; total += 11; }
+    else total += parseInt(carta.valor);
   }
   
   // Ajuste para ases
@@ -891,8 +912,8 @@ function decidirJogadaAvancada(mao, dealer, trueCount) {
   if(total === 12 && ['2','3'].includes(d) && trueCount >= 3) return "🔄 Parar (normalmente pedir, mas TC ≥ 3)";
   
   // Pares
-  if(mao.length === 2 && mao[0] === mao[1]) {
-    const par = mao[0];
+  if(mao.length === 2 && mao[0].valor === mao[1].valor) {
+    const par = mao[0].valor;
     if(par === 'A' || par === '8') return "✂️ DIVIDIR";
     if(par === '9' && ![7,10,'A'].includes(d)) return "✂️ DIVIDIR";
     if(par === '7' && d <= 7) return "✂️ DIVIDIR";
@@ -1000,7 +1021,7 @@ function calcularEMostrar() {
     </div>
     
     <div class="current-hand">
-      <p><i class="fas fa-hand-paper"></i> <strong>Sua mão:</strong> ${mao.length > 0 ? mao.join(' + ') + ` = ${calcularSoma(mao).total}` : 'Nenhuma carta'}</p>
+      <p><i class="fas fa-hand-paper"></i> <strong>Sua mão:</strong> ${mao.length > 0 ? mao.map(c => `${c.valor}${c.naipe}`).join(' + ') + ` = ${calcularSoma(mao).total}` : 'Nenhuma carta'}</p>
       <p><i class="fas fa-robot"></i> <strong>Dealer mostra:</strong> ${dealer || 'Nenhuma carta'}</p>
     </div>
   `;
@@ -1051,7 +1072,6 @@ apostaValorInput.addEventListener('change', () => {
     valorAposta
   }));
 });
-
 
 document.addEventListener('DOMContentLoaded', () => {
   atualizarHistorico(); 
